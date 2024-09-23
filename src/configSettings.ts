@@ -7,6 +7,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 
+function isValidIndividualSecurities(data: any): data is IndividualSecurities {
+    return data && typeof data.name === 'string' && typeof data.ticker === 'string';
+}
+
 
 export class StockProvider implements vscode.TreeDataProvider<Stock> {
 
@@ -25,7 +29,7 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
         const extensionName = packageJson.name;
         const userHomeDir = os.homedir();
         this.userVscodePath = path.join(userHomeDir, '.vscode', "extensions", extensionName);
-        this.loadDataFromWorkspace();        
+        this.loadDataFromWorkspace();
     }
 
     // 儲存資料到 .vscode/myTreeData.json 檔案
@@ -38,7 +42,7 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
                 fs.mkdirSync(this.userVscodePath);
             }
 
-            // 儲存資料到檔案
+            // 儲存資料到檔案     
             fs.writeFileSync(dataFilePath, JSON.stringify(this.items, null, 2), 'utf-8');
             vscode.window.showInformationMessage('Tree data saved to .vscode/myTreeData.json');
         } else {
@@ -52,7 +56,19 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
             const dataFilePath = path.join(this.userVscodePath, 'myTreeData.json');
             if (fs.existsSync(dataFilePath)) {
                 const data = fs.readFileSync(dataFilePath, 'utf-8');
-                this.items.push(JSON.parse(data) as Stock);
+                // this.items.push(JSON.parse(data) as Stock);
+                const rawDatas = JSON.parse(data);
+
+                // this.items = rawData.map((item: any) => new Stock(item.label));
+                for (const item of rawDatas) {
+                    if (isValidIndividualSecurities(item.list)) {
+                        const individualSecurities: IndividualSecurities = item.list;
+                        var s = new Stock(individualSecurities);
+                        this.items.push(s);
+                    } else {
+                        console.error("Invalid data format");
+                    }
+                }
                 this.refresh();
             }
         }

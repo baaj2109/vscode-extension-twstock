@@ -34,6 +34,9 @@ const listCheck_1 = __importDefault(require("./utils/listCheck"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const os = __importStar(require("os"));
+function isValidIndividualSecurities(data) {
+    return data && typeof data.name === 'string' && typeof data.ticker === 'string';
+}
 class StockProvider {
     _onDidChangeTreeData = new vscode.EventEmitter();
     onDidChangeTreeData = this._onDidChangeTreeData.event;
@@ -55,7 +58,7 @@ class StockProvider {
             if (!fs.existsSync(this.userVscodePath)) {
                 fs.mkdirSync(this.userVscodePath);
             }
-            // 儲存資料到檔案
+            // 儲存資料到檔案     
             fs.writeFileSync(dataFilePath, JSON.stringify(this.items, null, 2), 'utf-8');
             vscode.window.showInformationMessage('Tree data saved to .vscode/myTreeData.json');
         }
@@ -69,7 +72,19 @@ class StockProvider {
             const dataFilePath = path.join(this.userVscodePath, 'myTreeData.json');
             if (fs.existsSync(dataFilePath)) {
                 const data = fs.readFileSync(dataFilePath, 'utf-8');
-                this.items.push(JSON.parse(data));
+                // this.items.push(JSON.parse(data) as Stock);
+                const rawDatas = JSON.parse(data);
+                // this.items = rawData.map((item: any) => new Stock(item.label));
+                for (const item of rawDatas) {
+                    if (isValidIndividualSecurities(item.list)) {
+                        const individualSecurities = item.list;
+                        var s = new drawLayout_1.Stock(individualSecurities);
+                        this.items.push(s);
+                    }
+                    else {
+                        console.error("Invalid data format");
+                    }
+                }
                 this.refresh();
             }
         }
