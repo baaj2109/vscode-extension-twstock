@@ -1,0 +1,98 @@
+{
+    "name": "twstock",
+    "displayName": "twstock",
+    "description": "",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.93.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [],
+    "main": "./out/extension.js",
+    "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "Taiwan stock monitors",
+            "properties": {
+                "twstock.watchingList": {
+                    "type": "object",
+                    "default": {},
+                    "description": "your watching list"
+                },
+                "twstock.displayChangeUnitIn": {
+                    "type": "string",
+                    "default": "百分比",
+                    "enum": [
+                        "元",
+                        "百分比"
+                    ],
+                    "description": "列表上漲跌的單位(百分比/元)"
+                },
+                "twstock.refreshingRate": {
+                    "type": "number",
+                    "default": 10,
+                    "minimum": 2,
+                    "description": "單位: 秒\n列表上股票的更新頻率\n(設定越短的時間則鼠標停在個股上顯示的詳細資訊的時間也越短)"
+                }
+            }
+        },
+        "views": {
+            "explorer": [
+                {
+                    "id": "twstock",
+                    "name": "todo list"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "twstock.add",
+                "title": "add",
+                "icon": {
+                    "light": "media/treeViewIcon/addLight.svg",
+                    "dark": "media/treeViewIcon/addDark.svg"
+                }
+            },
+            {
+                "command": "twstock.item.remove",
+                "title": "remove"
+            }
+        ],
+        "menus": {
+            "view/title": [
+                {
+                    "command": "twstock.add",
+                    "when": "view == twstock",
+                    "group": "navigation"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "twstock.item.remove",
+                    "when": "view == twstock"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.93.0",
+        "@types/mocha": "^10.0.7",
+        "@types/node": "20.x",
+        "@typescript-eslint/eslint-plugin": "^8.3.0",
+        "@typescript-eslint/parser": "^8.3.0",
+        "eslint": "^9.9.1",
+        "typescript": "^5.5.4",
+        "@vscode/test-cli": "^0.0.10",
+        "@vscode/test-electron": "^2.4.1"
+    }
+}
