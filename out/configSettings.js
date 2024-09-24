@@ -90,6 +90,7 @@ class StockProvider {
                         console.error("Invalid data format");
                     }
                 }
+                this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
                 this.refresh();
             }
         }
@@ -160,7 +161,8 @@ class StockProvider {
                 }
             }
         }
-        // this.items = refreshItems;
+        // items sort by amount
+        this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
         this.refresh();
         this.saveDataToWorkspace();
     }
