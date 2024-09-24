@@ -6,6 +6,7 @@ import ListCheck from "./utils/listCheck";
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import StrProcess from "./utils/strProcess";
 
 function isValidIndividualSecurities(data: any): data is IndividualSecurities {
     return data && typeof data.name === 'string' && typeof data.ticker === 'string';
@@ -43,8 +44,8 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
             }
 
             // 儲存資料到檔案     
-            fs.writeFileSync(dataFilePath, JSON.stringify(this.items, null, 2), 'utf-8');
-            vscode.window.showInformationMessage('Tree data saved to .vscode/myTreeData.json');
+            fs.writeFileSync(dataFilePath, JSON.stringify(this.items.map((item) => item.list), null, 2), 'utf-8');
+            // vscode.window.showInformationMessage('Tree data saved to .vscode/myTreeData.json');
         } else {
             vscode.window.showErrorMessage('Workspace folder is undefined.');
         }
@@ -56,14 +57,18 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
             const dataFilePath = path.join(this.userVscodePath, 'myTreeData.json');
             if (fs.existsSync(dataFilePath)) {
                 const data = fs.readFileSync(dataFilePath, 'utf-8');
-                // this.items.push(JSON.parse(data) as Stock);
                 const rawDatas = JSON.parse(data);
 
-                // this.items = rawData.map((item: any) => new Stock(item.label));
                 for (const item of rawDatas) {
-                    if (isValidIndividualSecurities(item.list)) {
-                        const individualSecurities: IndividualSecurities = item.list;
+                    if (isValidIndividualSecurities(item)) {
+                        const individualSecurities: IndividualSecurities = item;
                         var s = new Stock(individualSecurities);
+                        if (!s.list.now) {
+                            s.list.now = s.list.lastClose;
+                            s.list.changeAmount = 0;
+                            s.list.changeRate = "0.00%";
+                            s.list.userDefinedDisplay = s.list.changeRate;
+                        }
                         this.items.push(s);
                     } else {
                         console.error("Invalid data format");
@@ -89,55 +94,70 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
         }
     }
 
-    // getChildren(): Promise<Array<Stock>> {
-    // return this.getWatchingList();
-    // }
-
-
-    // configuring(stocks: object): Promise<any> {
-    //     return new Promise((resolve) => {
-    //         const config = vscode.workspace.getConfiguration();
-    //         const watchingList = Object.assign(
-    //             {},
-    //             config.get("twstock.watchingList", {}),
-    //             stocks
-    //         );
-    //         config
-    //             .update("twstock.watchingList", watchingList, true)
-    //             .then(() => {
-    //                 resolve("update success on configuring");
-    //             });
-    //     });
-    // }
 
     async fetchConfig(stock: { [key: string]: Array<string> }) {
         const result = await twseApi(stock);
-        // console.log("fetch from twse api success");
-        // const insertStockObj: { [key: string]: number } = {};
-        // result.forEach((stockInfo) => {
-        //     if (stockInfo) {
-        //         /**
-        //          * 最終settings.json內的格式為 "tse_2412.tw": 123
-        //          * stockInfo.list.searchTicker = tse_2412.tw
-        //          * stockInfo.list.now = 123
-        //          */
-        //         // insertStockObj[stockInfo.list.searchTicker] = stockInfo.list.now;
-        //     }
-        // });
-        // await this.configuring(insertStockObj);
+
         return result;
     }
 
-    // async getWatchingList(): Promise<Array<Stock>> {
-    //     const config = vscode.workspace
-    //         .getConfiguration()
-    //         .get("twstock.watchingList", {});
+    async updateStock() {
+        const refreshItems: Stock[] = [];
 
-    //     console.log("before fetch");
-    //     const result: Array<Stock> = await this.fetchConfig(config);
-    //     console.log("after fetch");
-    //     return result;
-    // }
+        for (const item of this.items) {
+            const ticker = item.list.ticker;
+            const newStock: { [key: string]: Array<string> } = {};
+            let tempStock = ticker.trim();
+            let tempStockTse = "";
+            let tempStockOtc = "";
+            if (ticker !== "") {
+                tempStockTse = "tse_" + tempStock + ".tw";
+                tempStockOtc = "otc_" + tempStock + ".tw";
+                newStock[tempStockTse] = [];
+                newStock[tempStockOtc] = [];
+            }
+            const stocks = await this.fetchConfig(newStock);
+            for (const stock of stocks) {
+                if (stock) {
+                    // refreshItems.push(stock);
+                    item.list.fiveBuy = stock.list.fiveBuy;
+                    item.list.fiveSell = stock.list.fiveSell;
+                    item.list.fiveBuyAmount = stock.list.fiveBuyAmount;
+                    item.list.fiveSellAmount = stock.list.fiveSellAmount;
+                    item.list.high = stock.list.high;
+                    item.list.low = stock.list.low;
+                    item.list.highStop = stock.list.highStop;
+                    item.list.lowStop = stock.list.lowStop;
+
+                    if (stock.list.now) {
+                        item.list.now = stock.list.now;
+                        // Here we calculate changeAmount
+                        item.list.changeAmount = parseFloat(
+                            (item.list.now - item.list.lastClose).toFixed(2)
+                        );
+
+                        // // Here we calculate changeRate
+                        item.list.changeRate =
+                            (item.list.now - item.list.lastClose < 0 ? "-" : " ") +
+                            ((Math.abs(item.list.now - item.list.lastClose) / item.list.lastClose) * 100)
+                                .toFixed(2)
+                                .toString() +
+                            "%";
+                        item.list.userDefinedDisplay = item.list.changeRate;
+                        item.label = `${StrProcess.strFormatting(
+                            item.list.name,
+                            5,
+                            true //full width
+                        )} ${StrProcess.strFormatting(item.list.userDefinedDisplay, 10)} ${item.list.now}`;
+                    }
+                }
+            }
+        }
+        // this.items = refreshItems;
+        this.refresh();
+        this.saveDataToWorkspace();
+    }
+
 
     async addToList() {
         const result = await vscode.window.showInputBox({
@@ -188,23 +208,6 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
             const s = new Stock(list);
             this.items = this.items.filter(item => item.label != s.label);
             this.refresh();
-
-            // const config = vscode.workspace.getConfiguration();
-            // var watchingList: StockFormat = Object.assign(
-            //     {},
-            //     config.get("twstock.watchingList", {})
-            // );
-            // delete watchingList[list.searchTicker];
-            // config
-            //     .update("twstock.watchingList", watchingList, true)
-            //     .then(() => {
-            //         resolve("update success on remove config");
-            //         // this._onDidChangeTreeData.fire();
-            //         this.refresh
-            //         // if (ListCheck.isBecomeEmptyList() === true) {
-            //         //     vscode.commands.executeCommand("workbench.action.reloadWindow");
-            //         // }
-            //     });
         });
     }
 }

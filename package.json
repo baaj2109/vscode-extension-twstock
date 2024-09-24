@@ -34,7 +34,7 @@
                 },
                 "twstock.refreshingRate": {
                     "type": "number",
-                    "default": 10,
+                    "default": 5,
                     "minimum": 2,
                     "description": "單位: 秒\n列表上股票的更新頻率\n(設定越短的時間則鼠標停在個股上顯示的詳細資訊的時間也越短)"
                 }

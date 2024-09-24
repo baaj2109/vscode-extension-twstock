@@ -11,7 +11,7 @@ export class Stock extends vscode.TreeItem {
             // `${info.upDownSymbol} ${StrProcess.strFormatting(
             `${StrProcess.strFormatting(
                 info.name,
-                9,
+                5,
                 true //full width
             )} ${StrProcess.strFormatting(info.userDefinedDisplay, 10)} ${info.now}`,
             vscode.TreeItemCollapsibleState.None

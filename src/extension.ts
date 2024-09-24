@@ -30,8 +30,8 @@ export function activate(context: vscode.ExtensionContext) {
     const config = vscode.workspace.getConfiguration("twstock");
     const refreshingRate: number = config["refreshingRate"];
     setInterval(() => {
-        nodeProvider._onDidChangeTreeData.fire();
-        // nodeProvider.refresh();
+        // console.log("refreshing...");
+        nodeProvider.updateStock();
     }, refreshingRate * 1000);
 
     vscode.window.registerTreeDataProvider("twstock", nodeProvider);
@@ -45,7 +45,6 @@ export function activate(context: vscode.ExtensionContext) {
         })
     ); // subscriptions
     context.subscriptions.pop(
-
     )
 }
 
