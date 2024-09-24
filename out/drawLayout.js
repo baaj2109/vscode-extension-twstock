@@ -37,7 +37,6 @@ class Stock extends vscode.TreeItem {
         // `${info.upDownSymbol} ${StrProcess.strFormatting(
         `${strProcess_1.default.strFormatting(info.name, 5, true //full width
         )} ${strProcess_1.default.strFormatting(info.userDefinedDisplay, 10)} ${info.now}`, vscode.TreeItemCollapsibleState.None);
-        // super(info.name, vscode.TreeItemCollapsibleState.None);
         this.list = info;
         const mdDetails = new vscode.MarkdownString();
         mdDetails.appendMarkdown(`

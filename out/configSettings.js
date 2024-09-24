@@ -110,6 +110,13 @@ class StockProvider {
         return result;
     }
     async updateStock() {
+        // if current time after 13:30 skip
+        const now = new Date();
+        const hour = now.getHours();
+        const minute = now.getMinutes();
+        if (hour >= 13 && minute >= 30) {
+            return;
+        }
         const refreshItems = [];
         for (const item of this.items) {
             const ticker = item.list.ticker;

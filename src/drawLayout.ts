@@ -16,7 +16,6 @@ export class Stock extends vscode.TreeItem {
             )} ${StrProcess.strFormatting(info.userDefinedDisplay, 10)} ${info.now}`,
             vscode.TreeItemCollapsibleState.None
         );
-        // super(info.name, vscode.TreeItemCollapsibleState.None);
         this.list = info;
 
         const mdDetails = new vscode.MarkdownString();

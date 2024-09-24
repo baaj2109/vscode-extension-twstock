@@ -102,6 +102,14 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
     }
 
     async updateStock() {
+
+        // if current time after 13:30 skip
+        const now = new Date();
+        const hour = now.getHours();
+        const minute = now.getMinutes();
+        if (hour >= 13 && minute >= 30) {
+            return;
+        }
         const refreshItems: Stock[] = [];
 
         for (const item of this.items) {
