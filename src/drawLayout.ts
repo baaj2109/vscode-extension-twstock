@@ -19,9 +19,9 @@ export class Stock extends vscode.TreeItem {
         this.list = info;
 
         const mdDetails = new vscode.MarkdownString();
+        // ${StrProcess.strFormatting("公司", 6, true)}      ${info.name}
+        // ${StrProcess.strFormatting("代號", 6, true)}      ${info.ticker}
         mdDetails.appendMarkdown(`
-        ${StrProcess.strFormatting("公司", 6, true)}      ${info.name}
-        ${StrProcess.strFormatting("代號", 6, true)}      ${info.ticker}
         ${StrProcess.strFormatting("漲停價", 6, true)}     ${info.highStop}
         ${StrProcess.strFormatting("跌停價", 6, true)}     ${info.lowStop}
         ${StrProcess.strFormatting("累積成交量", 6, true)}  ${info.totalVolume}
@@ -35,13 +35,13 @@ export class Stock extends vscode.TreeItem {
         ${StrProcess.strFormatting("最低", 6, true)}       ${info.low}
         -----------------------------------------------------------------`);
         mdDetails.appendCodeblock(
-            `買量　  |　  買價　 ||    賣價　 |　賣量`,
+            `    買量    |   買價   ||    賣價   |  賣量`,
             "javascript"
         );
 
         for (let i = 0; i < info.fiveBuyAmount.length; i++) {
             mdDetails.appendCodeblock(
-                ` ${StrProcess.strFormatting(info.fiveBuyAmount[i].toString(), 6
+                `    ${StrProcess.strFormatting(info.fiveBuyAmount[i].toString(), 6
                 )} | ${StrProcess.strFormatting(info.fiveBuy[i].toString(), 8
                 )} || ${StrProcess.strFormatting(info.fiveSell[i].toString(), 8
                 )} |  ${StrProcess.strFormatting(info.fiveSellAmount[i].toString(), 6

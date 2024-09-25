@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 import { Stock } from "./drawLayout";
 import { twseApi } from "./apis/twseApi";
 import { StockFormat, IndividualSecurities } from "./utils/stockFormat";
-import ListCheck from "./utils/listCheck";
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
@@ -74,7 +73,7 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
                         console.error("Invalid data format");
                     }
                 }
-                this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
+                // this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
 
                 this.refresh();
             }
@@ -164,7 +163,7 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
             }
         }
         // items sort by amount
-        this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
+        // this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
         this.refresh();
         this.saveDataToWorkspace();
     }
@@ -177,7 +176,6 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
                 '輸入股票代號並使用"半形空白"添加多筆, e.g., 2002 2412, (目前只支援上市/上櫃公司，興櫃尚未支援)',
             placeHolder: "Add Stock to List",
         });
-        const reloadWindow: boolean = ListCheck.isEmptyList();
 
         if (result !== undefined) {
             const codeArray = result.split(/[ ]/);
@@ -203,19 +201,14 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
                     this.items.push(item);
                 }
             }
-            // this._onDidChangeTreeData.fire();
             this.refresh()
             this.saveDataToWorkspace();
-            // if (reloadWindow === true) {
-            // vscode.commands.executeCommand("workbench.action.reloadWindow");
-            // }
         }
     }
 
     async removeFromList(stock: { list: IndividualSecurities }): Promise<any> {
         return new Promise((resolve) => {
             const { list } = stock;
-
             const s = new Stock(list);
             this.items = this.items.filter(item => item.label != s.label);
             this.refresh();

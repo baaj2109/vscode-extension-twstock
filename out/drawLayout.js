@@ -39,9 +39,9 @@ class Stock extends vscode.TreeItem {
         )} ${strProcess_1.default.strFormatting(info.userDefinedDisplay, 10)} ${info.now}`, vscode.TreeItemCollapsibleState.None);
         this.list = info;
         const mdDetails = new vscode.MarkdownString();
+        // ${StrProcess.strFormatting("公司", 6, true)}      ${info.name}
+        // ${StrProcess.strFormatting("代號", 6, true)}      ${info.ticker}
         mdDetails.appendMarkdown(`
-        ${strProcess_1.default.strFormatting("公司", 6, true)}      ${info.name}
-        ${strProcess_1.default.strFormatting("代號", 6, true)}      ${info.ticker}
         ${strProcess_1.default.strFormatting("漲停價", 6, true)}     ${info.highStop}
         ${strProcess_1.default.strFormatting("跌停價", 6, true)}     ${info.lowStop}
         ${strProcess_1.default.strFormatting("累積成交量", 6, true)}  ${info.totalVolume}
@@ -54,9 +54,9 @@ class Stock extends vscode.TreeItem {
         ${strProcess_1.default.strFormatting("最高", 6, true)}       ${info.high}
         ${strProcess_1.default.strFormatting("最低", 6, true)}       ${info.low}
         -----------------------------------------------------------------`);
-        mdDetails.appendCodeblock(`買量　  |　  買價　 ||    賣價　 |　賣量`, "javascript");
+        mdDetails.appendCodeblock(`    買量    |   買價   ||    賣價   |  賣量`, "javascript");
         for (let i = 0; i < info.fiveBuyAmount.length; i++) {
-            mdDetails.appendCodeblock(` ${strProcess_1.default.strFormatting(info.fiveBuyAmount[i].toString(), 6)} | ${strProcess_1.default.strFormatting(info.fiveBuy[i].toString(), 8)} || ${strProcess_1.default.strFormatting(info.fiveSell[i].toString(), 8)} |  ${strProcess_1.default.strFormatting(info.fiveSellAmount[i].toString(), 6)}`, "javascript");
+            mdDetails.appendCodeblock(`    ${strProcess_1.default.strFormatting(info.fiveBuyAmount[i].toString(), 6)} | ${strProcess_1.default.strFormatting(info.fiveBuy[i].toString(), 8)} || ${strProcess_1.default.strFormatting(info.fiveSell[i].toString(), 8)} |  ${strProcess_1.default.strFormatting(info.fiveSellAmount[i].toString(), 6)}`, "javascript");
         }
         this.tooltip = mdDetails;
     }

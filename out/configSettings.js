@@ -30,7 +30,6 @@ exports.StockProvider = void 0;
 const vscode = __importStar(require("vscode"));
 const drawLayout_1 = require("./drawLayout");
 const twseApi_1 = require("./apis/twseApi");
-const listCheck_1 = __importDefault(require("./utils/listCheck"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const os = __importStar(require("os"));
@@ -90,7 +89,7 @@ class StockProvider {
                         console.error("Invalid data format");
                     }
                 }
-                this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
+                // this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
                 this.refresh();
             }
         }
@@ -162,7 +161,7 @@ class StockProvider {
             }
         }
         // items sort by amount
-        this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
+        // this.items = this.items.sort((a, b) => parseInt(b.list.totalVolume) - parseInt(a.list.totalVolume));
         this.refresh();
         this.saveDataToWorkspace();
     }
@@ -172,7 +171,6 @@ class StockProvider {
             prompt: '輸入股票代號並使用"半形空白"添加多筆, e.g., 2002 2412, (目前只支援上市/上櫃公司，興櫃尚未支援)',
             placeHolder: "Add Stock to List",
         });
-        const reloadWindow = listCheck_1.default.isEmptyList();
         if (result !== undefined) {
             const codeArray = result.split(/[ ]/);
             const newStock = {};
@@ -196,12 +194,8 @@ class StockProvider {
                     this.items.push(item);
                 }
             }
-            // this._onDidChangeTreeData.fire();
             this.refresh();
             this.saveDataToWorkspace();
-            // if (reloadWindow === true) {
-            // vscode.commands.executeCommand("workbench.action.reloadWindow");
-            // }
         }
     }
     async removeFromList(stock) {

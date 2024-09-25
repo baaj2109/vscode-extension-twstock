@@ -14,7 +14,6 @@ class StrProcess {
                 dummySpaces += " ";
             }
         }
-
         return sourceString + dummySpaces;
     }
 }
