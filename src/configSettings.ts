@@ -142,13 +142,13 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
                         item.list.now = stock.list.now;
                         // Here we calculate changeAmount
                         item.list.changeAmount = parseFloat(
-                            (item.list.now - item.list.lastClose).toFixed(2)
+                            (stock.list.now - stock.list.lastClose).toFixed(2)
                         );
 
                         // // Here we calculate changeRate
                         item.list.changeRate =
-                            (item.list.now - item.list.lastClose < 0 ? "-" : " ") +
-                            ((Math.abs(item.list.now - item.list.lastClose) / item.list.lastClose) * 100)
+                            (stock.list.now - stock.list.lastClose < 0 ? "-" : " ") +
+                            ((Math.abs(stock.list.now - stock.list.lastClose) / stock.list.lastClose) * 100)
                                 .toFixed(2)
                                 .toString() +
                             "%";
@@ -157,7 +157,7 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
                             item.list.name,
                             5,
                             true //full width
-                        )} ${StrProcess.strFormatting(item.list.userDefinedDisplay, 10)} ${item.list.now}`;
+                        )} ${StrProcess.strFormatting(item.list.userDefinedDisplay, 10)} ${stock.list.now}`;
                     }
                 }
             }

@@ -145,17 +145,17 @@ class StockProvider {
                     if (stock.list.now) {
                         item.list.now = stock.list.now;
                         // Here we calculate changeAmount
-                        item.list.changeAmount = parseFloat((item.list.now - item.list.lastClose).toFixed(2));
+                        item.list.changeAmount = parseFloat((stock.list.now - stock.list.lastClose).toFixed(2));
                         // // Here we calculate changeRate
                         item.list.changeRate =
-                            (item.list.now - item.list.lastClose < 0 ? "-" : " ") +
-                                ((Math.abs(item.list.now - item.list.lastClose) / item.list.lastClose) * 100)
+                            (stock.list.now - stock.list.lastClose < 0 ? "-" : " ") +
+                                ((Math.abs(stock.list.now - stock.list.lastClose) / stock.list.lastClose) * 100)
                                     .toFixed(2)
                                     .toString() +
                                 "%";
                         item.list.userDefinedDisplay = item.list.changeRate;
                         item.label = `${strProcess_1.default.strFormatting(item.list.name, 5, true //full width
-                        )} ${strProcess_1.default.strFormatting(item.list.userDefinedDisplay, 10)} ${item.list.now}`;
+                        )} ${strProcess_1.default.strFormatting(item.list.userDefinedDisplay, 10)} ${stock.list.now}`;
                     }
                 }
             }
