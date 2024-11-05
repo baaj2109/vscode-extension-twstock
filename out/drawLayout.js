@@ -31,6 +31,13 @@ const vscode = __importStar(require("vscode"));
 const strProcess_1 = __importDefault(require("./utils/strProcess"));
 class Stock extends vscode.TreeItem {
     list;
+    updateTitle(title) {
+        const currentDate = new Date();
+        const hour = currentDate.getHours();
+        const minute = currentDate.getMinutes();
+        const second = currentDate.getSeconds();
+        this.label = title + " " + hour + ":" + minute + ":" + second;
+    }
     constructor(info) {
         super(
         // use template literals

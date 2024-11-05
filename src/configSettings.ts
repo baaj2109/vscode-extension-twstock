@@ -80,7 +80,6 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
         }
     }
 
-
     refresh(): void {
         this._onDidChangeTreeData.fire();
     }
@@ -95,21 +94,24 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
         }
     }
 
-
     async fetchConfig(stock: { [key: string]: Array<string> }) {
         const result = await twseApi(stock);
 
         return result;
     }
 
+    private readOnce: boolean = true;
     async updateStock() {
-
         // if current time after 13:30 skip
         const now = new Date();
         const hour = now.getHours();
         const minute = now.getMinutes();
         if (hour >= 13 && minute >= 30) {
-            return;
+            if (this.readOnce) {
+                this.readOnce = false;
+            } else {
+                return;
+            }
         }
         const refreshItems: Stock[] = [];
 
@@ -153,11 +155,16 @@ export class StockProvider implements vscode.TreeDataProvider<Stock> {
                                 .toString() +
                             "%";
                         item.list.userDefinedDisplay = item.list.changeRate;
-                        item.label = `${StrProcess.strFormatting(
+                        item.updateTitle(`${StrProcess.strFormatting(
                             item.list.name,
                             5,
                             true //full width
-                        )} ${StrProcess.strFormatting(item.list.userDefinedDisplay, 10)} ${stock.list.now}`;
+                        )} ${StrProcess.strFormatting(item.list.userDefinedDisplay, 10)} ${stock.list.now}`);
+                        // item.label = `${StrProcess.strFormatting(
+                        //     item.list.name,
+                        //     5,
+                        //     true //full width
+                        // )} ${StrProcess.strFormatting(item.list.userDefinedDisplay, 10)} ${stock.list.now}`;
                     }
                 }
             }

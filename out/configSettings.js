@@ -109,13 +109,19 @@ class StockProvider {
         const result = await (0, twseApi_1.twseApi)(stock);
         return result;
     }
+    readOnce = true;
     async updateStock() {
         // if current time after 13:30 skip
         const now = new Date();
         const hour = now.getHours();
         const minute = now.getMinutes();
         if (hour >= 13 && minute >= 30) {
-            return;
+            if (this.readOnce) {
+                this.readOnce = false;
+            }
+            else {
+                return;
+            }
         }
         const refreshItems = [];
         for (const item of this.items) {
@@ -154,8 +160,13 @@ class StockProvider {
                                     .toString() +
                                 "%";
                         item.list.userDefinedDisplay = item.list.changeRate;
-                        item.label = `${strProcess_1.default.strFormatting(item.list.name, 5, true //full width
-                        )} ${strProcess_1.default.strFormatting(item.list.userDefinedDisplay, 10)} ${stock.list.now}`;
+                        item.updateTitle(`${strProcess_1.default.strFormatting(item.list.name, 5, true //full width
+                        )} ${strProcess_1.default.strFormatting(item.list.userDefinedDisplay, 10)} ${stock.list.now}`);
+                        // item.label = `${StrProcess.strFormatting(
+                        //     item.list.name,
+                        //     5,
+                        //     true //full width
+                        // )} ${StrProcess.strFormatting(item.list.userDefinedDisplay, 10)} ${stock.list.now}`;
                     }
                 }
             }

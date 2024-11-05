@@ -5,6 +5,14 @@ import StrProcess from "./utils/strProcess";
 export class Stock extends vscode.TreeItem {
     list: IndividualSecurities;
 
+    updateTitle(title: string) {
+        const currentDate = new Date();
+        const hour = currentDate.getHours();
+        const minute = currentDate.getMinutes();
+        const second = currentDate.getSeconds();
+        this.label = title + " " + hour + ":" + minute + ":" + second;
+    }
+
     constructor(info: IndividualSecurities) {
         super(
             // use template literals
